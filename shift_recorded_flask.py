@@ -1,47 +1,34 @@
-from flask import Flask, url_for, request, render_template
+from flask import Flask, url_for, redirect, request, render_template
+
 app = Flask(__name__)
 
 
 @app.route('/')
-def hello_world():
-    return "Hello world <a href=\"/index\">index</a>"
-
-
 @app.route('/index')
-def index():
-    return "well this point to index"
-
-
-@app.route('/user/<username>')
-def print_user(username):
-    return f"username is {username}"
-
-
-@app.route('/id/<int:user_id>')
-def get_id(user_id):
-    return f'the id is {user_id}'
-
-
-@app.route('/path/<path:sub_path>')
-def get_path(sub_path):
-    return f'--> {sub_path} <---'
-
-
-with app.test_request_context():
-    print("url for function get_id with user_id set to 2651651", url_for('get_id', user_id='464654654'))
-    print(url_for('get_path', sub_path="/id/5454646/hello/"))
-
-
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login')
 def login():
+    return render_template("login_form.html")
+
+
+@app.route('/login_check', methods=['POST', 'GET'])
+def login_check():
     if request.method == 'POST':
-        return "a request has been made from client to server : asking to POST some data"
-    elif request.method == 'GET':
-        return "a request has been made from a client to server : asking to GET something"
+        app.logger.debug("a request has been made from client to server : asking to POST some data :\n" + "username : ")
+        app.logger.debug(request.form["username"] + " - " + request.form["password"] + "button: " + request.form["submit_btn"])
+        if request.form["submit_btn"] == "new user":
+            return redirect(url_for("create_new_user"))
+        else:
+            return "ok data to be checked: " + request.form["username"] + " ... " + request.form["password"]
+    else:
+        print("a requestfor a GET made")
+        return "a request has been made from a client to server : asking for something"
 
 
-@app.route('/hello/')
-@app.route('/hello/<name>')
-def hello(name=None):
-    return render_template('hello.html', name=name)
-
+@app.route('/create_new_user_check', methods=['GET', 'POST'])
+def create_new_user():
+    if request.method == 'GET':
+        return render_template("new_user_form.html")
+    elif request.method  == 'POST':
+        return "create new user with data: " + request.form["name"]
+    else:
+        return "else request method "

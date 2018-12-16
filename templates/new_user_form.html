@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<link rel="stylesheet " href="{{ url_for('static', filename='style.css')}}" >
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create user form - Shift recorder</title>
+</head>
+<body>
+<div >
+    <form action="/create_new_user_check" method="post">
+        <fieldset>
+            <legend>New user :</legend>
+            <center>
+                Enter your username : <input name="username" type="text" value="Sim4n6"><br>
+                Enter your name : <input name="name" type="text" value="Kaot"><br>
+                Enter your password : <input name="password" type="password" ><br><br>
+                <button type="submit" name="submit_btn" value="create new user" autofocus>Create new user</button>
+                <button type="reset">Reset</button>
+            </center>
+        </fieldset>
+    </form>
+</div>
+
+</body>
+</html>
