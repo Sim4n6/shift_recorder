@@ -2,12 +2,12 @@ import tkinter as tk
 from tkinter import messagebox as ms
 import xlsxwriter as xwr
 import sqlite3 as lite
-import hashlib as hsh
+from hashlib import sha1
 import datetime
 
 
 def encrypt_password(password):
-    return hsh.sha1(password.encode('UTF-8')).hexdigest()
+    return sha1(password.encode('UTF-8')).hexdigest()
 
 
 class MainWindow:
