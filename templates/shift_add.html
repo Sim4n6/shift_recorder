@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<style>
+fieldset {
+  display: block;
+  margin-left: 2px;
+  margin-right: 2px;
+  padding-top: 0.35em;
+  padding-bottom: 0.625em;
+  padding-left: 0.75em;
+  padding-right: 0.75em;
+  border: 2px groove (internal value);
+}
+
+div {
+    width: 400px;
+    height: 100px;
+    margin: auto;
+}
+
+
+</style>
+<head>
+    <meta charset="UTF-8">
+    <title>Login form - Shift recorder</title>
+</head>
+<body>
+<div>
+    <form action="/shift_add" method="post">
+        <fieldset>
+            <legend>Login :</legend>
+            <center>
+                hi
+                <a href="/logout">logout</a>
+            </center>
+        </fieldset>
+    </form>
+</div>
+
+</body>
+</html>
