@@ -22,29 +22,6 @@ def initialize_db(db_name):
         conn0.close()
 
 
-def add_new_user(db_name):
-    try:
-        conn4 = lite.connect(db_name)
-        c4 = conn4.cursor()
-        # Find Existing username if any take proper action
-        find_user = '''SELECT DISTINCT username, name FROM user WHERE username = ? and name = ? '''
-        c4.execute(find_user, [request.form["username"], request.form["name"]])
-        if c4.fetchall():
-            flash('Username taken try a different one, please.')
-        else:
-            # defined a function for encrypting password
-            conn4.create_function('encrypt', 1, encrypt_password)
-            # Create New Account
-            insert = '''INSERT INTO user (username, name, password) VALUES(?, ?, encrypt(?))'''
-            c4.execute(insert, [request.form["username"], request.form["name"], request.form["password"]])
-            conn4.commit()
-    except lite.Error as e:
-        conn4.rollback()
-        app.logger.error("An error occurred : " + e.args[0])
-    finally:
-        conn4.close()
-
-
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8zZERUNdnJE'
 
@@ -95,8 +72,26 @@ def create_new_user():
     if request.method == 'GET':
         return render_template("new_user_form.html")
     elif request.method == 'POST':
-        add_new_user("shifts.db")
-        flash(f"a user named : {request.form['name']} has been created")
+        try:
+            conn4 = lite.connect("shifts.db")
+            c4 = conn4.cursor()
+            # Find Existing username if any take proper action
+            find_user = '''SELECT DISTINCT username, name FROM user WHERE username = ? and name = ? '''
+            c4.execute(find_user, [request.form["username"], request.form["name"]])
+            if c4.fetchall():
+                flash('Username taken try a different one, please.')
+            else:
+                # defined a function for encrypting password
+                conn4.create_function('encrypt', 1, encrypt_password)
+                # Create New Account
+                insert = '''INSERT INTO user (username, name, password) VALUES(?, ?, encrypt(?))'''
+                c4.execute(insert, [request.form["username"], request.form["name"], request.form["password"]])
+                conn4.commit()
+        except lite.Error as e:
+            conn4.rollback()
+            app.logger.error("An error occurred : " + e.args[0])
+        finally:
+            conn4.close()
         return redirect(url_for("login_check"))
     else:
         return "else request method "
@@ -104,7 +99,9 @@ def create_new_user():
 
 @app.route("/shift_add")
 def shift_add():
-    return render_template("shift_add.html")
+    if 'username' in session:
+        return render_template("shift_add.html")
+    return redirect(url_for("logout"))
 
 
 @app.route('/logout')

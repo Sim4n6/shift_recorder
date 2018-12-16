@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-<link rel="stylesheet " href="{{ url_for('static', filename='style.css')}}" >
+<link rel="stylesheet " href="{{ url_for('static', filename='style.css')}}">
 
 <head>
     <meta charset="UTF-8">
     <title>Create user form - Shift recorder</title>
 </head>
 <body>
-<div >
+<div>
     <form action="/create_new_user" method="post">
         <fieldset>
             <legend>New user :</legend>
             <center>
                 Enter your username : <input name="username" type="text" value="Sim4n6"><br>
                 Enter your name : <input name="name" type="text" value="Kaot"><br>
-                Enter your password : <input name="password" type="password" ><br><br>
+                Enter your password : <input name="password" type="password"><br><br>
                 <button type="submit" name="submit_btn" value="create new user" autofocus>Create new user</button>
                 <button type="reset">Reset</button>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for message in messages %}
+                <br><font size="2" color="red">{{ message }}</font>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
             </center>
         </fieldset>
     </form>
