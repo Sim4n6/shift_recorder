@@ -13,7 +13,7 @@ def initialize_db(db_name):
 		conn0 = lite.connect(db_name)
 		c0 = conn0.cursor()
 		c0.execute('''CREATE TABLE IF NOT EXISTS user(employee_id INTEGER PRIMARY KEY, username TEXT NOT NULL, 
-                    name TEXT NOT NULL, password TEXT NOT NULL );''')
+						name TEXT NOT NULL, password TEXT NOT NULL );''')
 		conn0.commit()
 	except lite.Error as e:
 		conn0.rollback()
@@ -31,7 +31,7 @@ app.secret_key = b'_5#y2L"F4Q8zZERUNdnJE'
 def index():
 	initialize_db("shifts.db")
 	if 'username' in session:
-		return redirect(url_for("shift_add"))
+		return render_template("shift_add.html", user_logged=session["username"])
 	return redirect(url_for("login_check"))
 
 
@@ -52,7 +52,7 @@ def login_check():
 
 				if result:
 					session['username'] = request.form['username']
-					return redirect(url_for("shift_add"), request.form["username"])
+					return render_template("shift_add.html", user_logged=request.form["username"])
 				else:
 					flash('could not connect !')
 			except lite.Error as e:
@@ -80,6 +80,7 @@ def create_new_user():
 			c4.execute(find_user, [request.form["username"], request.form["name"]])
 			if c4.fetchall():
 				flash('Username taken try a different one, please.')
+				isStay = True
 			else:
 				# defined a function for encrypting password
 				conn4.create_function('encrypt', 1, encrypt_password)
@@ -87,20 +88,28 @@ def create_new_user():
 				insert = '''INSERT INTO user (username, name, password) VALUES(?, ?, encrypt(?))'''
 				c4.execute(insert, [request.form["username"], request.form["name"], request.form["password"]])
 				conn4.commit()
+				flash('new account created successfully ')
+				isStay = False
 		except lite.Error as e:
 			conn4.rollback()
 			app.logger.error("An error occurred : " + e.args[0])
+			flash('an error occurred')
 		finally:
 			conn4.close()
-		return redirect(url_for("login_check"))
+			if isStay:
+				return redirect(url_for("create_new_user"))
+			else:
+				return redirect(url_for("login_check"))
+
 	else:
 		return "else request method "
 
 
-@app.route("/shift_add")
+@app.route("/shift_add", methods=['GET', 'POST'])
 def shift_add():
 	if 'username' in session:
-		return render_template("shift_add.html")
+		app.logger.info(">>>>" + str(type(session)))
+		return render_template("shift_add.html", user_logged=session["username"])
 	return redirect(url_for("logout"))
 
 
