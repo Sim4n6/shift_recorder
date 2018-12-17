@@ -8,11 +8,11 @@ def encrypt_password(password):
 	return sha1(password.encode('UTF-8')).hexdigest()
 
 
-def initialize_db(db_name):
+def initialize_db(db_name_arg):
 	try:
-		conn0 = lite.connect(db_name)
+		conn0 = lite.connect(db_name_arg)
 		c0 = conn0.cursor()
-		c0.execute('''CREATE TABLE IF NOT EXISTS user(employee_id INTEGER PRIMARY KEY, username TEXT NOT NULL, 
+		c0.execute('''CREATE TABLE IF NOT EXISTS users(employee_id INTEGER PRIMARY KEY, username TEXT NOT NULL, 
 						name TEXT NOT NULL, password TEXT NOT NULL );''')
 		conn0.commit()
 	except lite.Error as e:
@@ -24,12 +24,13 @@ def initialize_db(db_name):
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8zZERUNdnJE'
+db_name = "shifts.db"
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-	initialize_db("shifts.db")
+	initialize_db(db_name)
 	if 'username' in session:
 		return render_template("shift_add.html", user_logged=session["username"])
 	return redirect(url_for("login_check"))
@@ -39,11 +40,11 @@ def index():
 def login_check():
 	if request.method == 'POST':
 		if request.form["submit_btn"] == "new user":
-			return redirect(url_for("create_new_user"))
+			return redirect(url_for("register"))
 		else:
 			try:
 				# Establish Connection
-				conn3 = lite.connect('shifts.db')
+				conn3 = lite.connect(db_name)
 				c3 = conn3.cursor()
 				# Find user If there is any take proper action
 				find_user = '''SELECT * FROM user WHERE username = ? and password = ?'''
@@ -67,13 +68,13 @@ def login_check():
 		return "a request has been made from a client to server : asking for something"
 
 
-@app.route('/create_new_user', methods=['GET', 'POST'])
-def create_new_user():
+@app.route('/register', methods=['GET', 'POST'])
+def register():
 	if request.method == 'GET':
-		return render_template("new_user_form.html")
+		return render_template("register_form.html")
 	elif request.method == 'POST':
 		try:
-			conn4 = lite.connect("shifts.db")
+			conn4 = lite.connect(db_name)
 			c4 = conn4.cursor()
 			# Find Existing username if any take proper action
 			find_user = '''SELECT DISTINCT username, name FROM user WHERE username = ? and name = ? '''
@@ -97,7 +98,7 @@ def create_new_user():
 		finally:
 			conn4.close()
 			if is_stay:
-				return redirect(url_for("create_new_user"))
+				return redirect(url_for("register"))
 			else:
 				return redirect(url_for("login_check"))
 
@@ -112,11 +113,12 @@ def shift_add():
 			return render_template("shift_add.html", user_logged=session["username"])
 		else:
 			if request.form["yes_no_btn"] == "yes":
-				flash("yes")
+				flash("yes clicked")
 			elif request.form["yes_no_btn"] == "no" :
-				flash("no")
+				flash("no clicked")
 			return render_template("shift_add.html", user_logged=session["username"])
-	return redirect(url_for("logout"))
+	else:
+		return redirect(url_for("logout"))
 
 
 @app.route('/logout')
