@@ -80,7 +80,7 @@ def create_new_user():
 			c4.execute(find_user, [request.form["username"], request.form["name"]])
 			if c4.fetchall():
 				flash('Username taken try a different one, please.')
-				isStay = True
+				is_stay = True
 			else:
 				# defined a function for encrypting password
 				conn4.create_function('encrypt', 1, encrypt_password)
@@ -89,14 +89,14 @@ def create_new_user():
 				c4.execute(insert, [request.form["username"], request.form["name"], request.form["password"]])
 				conn4.commit()
 				flash('new account created successfully ')
-				isStay = False
+				is_stay = False
 		except lite.Error as e:
 			conn4.rollback()
 			app.logger.error("An error occurred : " + e.args[0])
 			flash('an error occurred')
 		finally:
 			conn4.close()
-			if isStay:
+			if is_stay:
 				return redirect(url_for("create_new_user"))
 			else:
 				return redirect(url_for("login_check"))
@@ -108,8 +108,14 @@ def create_new_user():
 @app.route("/shift_add", methods=['GET', 'POST'])
 def shift_add():
 	if 'username' in session:
-		app.logger.info(">>>>" + str(type(session)))
-		return render_template("shift_add.html", user_logged=session["username"])
+		if request.method == "GET":
+			return render_template("shift_add.html", user_logged=session["username"])
+		else:
+			if request.form["yes_no_btn"] == "yes":
+				flash("yes")
+			elif request.form["yes_no_btn"] == "no" :
+				flash("no")
+			return render_template("shift_add.html", user_logged=session["username"])
 	return redirect(url_for("logout"))
 
 

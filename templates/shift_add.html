@@ -12,7 +12,15 @@
         <fieldset>
             <legend>Logged in as : {{ user_logged }}</legend>
             <center>
-                hi
+                hi {{ user_logged }}, is it your shift today : <button type="submit" name="yes_no_btn" value="yes">Yes</button>
+                <button type="submit" name="yes_no_btn" value="no">No</button><br>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for message in messages %}
+                <br><font size="2" color="red">{{ message }}</font><br>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
                 <a href="/logout">logout</a>
             </center>
         </fieldset>
