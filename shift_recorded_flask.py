@@ -22,9 +22,11 @@ def initialize_db(db_name_arg):
 		conn0.close()
 
 
+db_name = "shifts.db"
+
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8zZERUNdnJE'
-db_name = "shifts.db"
+app.config['ENV'] = "developement"
 
 
 @app.route('/')
@@ -125,3 +127,6 @@ def shift_add():
 def logout():
 	session.pop('username', None)
 	return redirect(url_for('index'))
+
+
+app.run("127.0.0.1", "5000", debug=True)
