@@ -49,7 +49,7 @@ def login_check():
 				conn3 = lite.connect(db_name)
 				c3 = conn3.cursor()
 				# Find user If there is any take proper action
-				find_user = '''SELECT * FROM user WHERE username = ? and password = ?'''
+				find_user = '''SELECT * FROM users WHERE username = ? and password = ?'''
 				c3.execute(find_user, [request.form["username"], encrypt_password(request.form["password"])])
 				result = c3.fetchall()
 
@@ -75,11 +75,12 @@ def register():
 	if request.method == 'GET':
 		return render_template("register_form.html")
 	elif request.method == 'POST':
+		print(request.form["submit_btn"])
 		try:
 			conn4 = lite.connect(db_name)
 			c4 = conn4.cursor()
 			# Find Existing username if any take proper action
-			find_user = '''SELECT DISTINCT username, name FROM user WHERE username = ? and name = ? '''
+			find_user = '''SELECT DISTINCT username, name FROM users WHERE username = ? and name = ? '''
 			c4.execute(find_user, [request.form["username"], request.form["name"]])
 			if c4.fetchall():
 				flash('Username taken try a different one, please.')
@@ -88,7 +89,7 @@ def register():
 				# defined a function for encrypting password
 				conn4.create_function('encrypt', 1, encrypt_password)
 				# Create New Account
-				insert = '''INSERT INTO user (username, name, password) VALUES(?, ?, encrypt(?))'''
+				insert = '''INSERT INTO users (username, name, password) VALUES(?, ?, encrypt(?))'''
 				c4.execute(insert, [request.form["username"], request.form["name"], request.form["password"]])
 				conn4.commit()
 				flash('new account created successfully ')
@@ -100,6 +101,7 @@ def register():
 		finally:
 			conn4.close()
 			if is_stay:
+				print(url_for("register"))
 				return redirect(url_for("register"))
 			else:
 				return redirect(url_for("login_check"))
